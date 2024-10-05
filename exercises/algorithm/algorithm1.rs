@@ -71,11 +71,45 @@ impl<T> LinkedList<T> {
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+		let mut result=self::new();
+        let mut a = list_a.start;
+        let mut b = list_b.start;
+        if(a.is_some()&&b.is_some()){
+            while a.is_some() && b.is_some() {
+                let a_val = unsafe { &(*a.unwrap().as_ptr()).val };
+                let b_val = unsafe { &(*b.unwrap().as_ptr()).val };
+    
+                if *a_val < *b_val {
+                    result.add(std::mem::replace(a_val, T::default()));
+                    a = unsafe { (*a.unwrap().as_ptr()).next };
+                } else {
+                    result.add(std::mem::replace(b_val, T::default()));
+                    b = unsafe { (*b.unwrap().as_ptr()).next };
+                }
+            }
+    
+            // Append the remaining elements from list_a, if any
+            while a.is_some() {
+                let a_val = unsafe { &(*a.unwrap().as_ptr()).val };
+                result.add(std::mem::replace(a_val, T::default()));
+                a = unsafe { (*a.unwrap().as_ptr()).next };
+            }
+    
+            // Append the remaining elements from list_b, if any
+            while b.is_some() {
+                let b_val = unsafe { &(*b.unwrap().as_ptr()).val };
+                result.add(std::mem::replace(b_val, T::default()));
+                b = unsafe { (*b.unwrap().as_ptr()).next };
+            }
+    
+            result
+        }
+		else{
+            Self {
+                length: 0,
+                start: None,
+                end: None,
+            }
         }
 	}
 }
