@@ -8,18 +8,8 @@
 pub fn factorial(num: u64) -> u64 {
     match num{
         0=>1,
-        _=>vec![1..=num].product()
+        _=>(1..=num).product()
     }
-    
-    // Complete this function to return the factorial of num
-    // Do not use:
-    // - return
-    // Try not to use:
-    // - imperative style loops (for, while)
-    // - additional variables
-    // For an extra challenge, don't use:
-    // - recursion
-    // Execute `rustlings hint iterators4` for hints.
 }
 
 #[cfg(test)]

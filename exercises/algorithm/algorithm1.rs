@@ -69,49 +69,38 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self where T:PartialOrd+Clone,
 	{
-		let mut result=self::new();
+        let mut result = LinkedList::new();
         let mut a = list_a.start;
         let mut b = list_b.start;
-        if(a.is_some()&&b.is_some()){
-            while a.is_some() && b.is_some() {
-                let a_val = unsafe { &(*a.unwrap().as_ptr()).val };
-                let b_val = unsafe { &(*b.unwrap().as_ptr()).val };
-    
-                if *a_val < *b_val {
-                    result.add(std::mem::replace(a_val, T::default()));
-                    a = unsafe { (*a.unwrap().as_ptr()).next };
-                } else {
-                    result.add(std::mem::replace(b_val, T::default()));
-                    b = unsafe { (*b.unwrap().as_ptr()).next };
-                }
-            }
-    
-            // Append the remaining elements from list_a, if any
-            while a.is_some() {
-                let a_val = unsafe { &(*a.unwrap().as_ptr()).val };
-                result.add(std::mem::replace(a_val, T::default()));
-                a = unsafe { (*a.unwrap().as_ptr()).next };
-            }
-    
-            // Append the remaining elements from list_b, if any
-            while b.is_some() {
-                let b_val = unsafe { &(*b.unwrap().as_ptr()).val };
-                result.add(std::mem::replace(b_val, T::default()));
-                b = unsafe { (*b.unwrap().as_ptr()).next };
-            }
-    
-            result
-        }
-		else{
-            Self {
-                length: 0,
-                start: None,
-                end: None,
+
+        while a.is_some() && b.is_some() {
+            let node_a = a.unwrap();
+            let node_b = b.unwrap();
+
+            if unsafe { &(*node_a.as_ptr()).val } < unsafe { &(*node_b.as_ptr()).val } {
+                result.add(unsafe { &(*node_a.as_ptr()).val }.clone());
+                a = unsafe { (*node_a.as_ptr()).next };
+            } else {
+                result.add(unsafe { &(*node_b.as_ptr()).val }.clone());
+                b = unsafe { (*node_b.as_ptr()).next };
             }
         }
-	}
+        while a.is_some() {
+            let node = a.unwrap();
+            result.add(unsafe { &(*node.as_ptr()).val }.clone());
+            a = unsafe { (*node.as_ptr()).next };
+        }
+        while b.is_some() {
+            let node = b.unwrap();
+            result.add(unsafe { &(*node.as_ptr()).val }.clone());
+            b = unsafe { (*node.as_ptr()).next };
+        }
+
+        result
+    }
+        
 }
 
 impl<T> Display for LinkedList<T>

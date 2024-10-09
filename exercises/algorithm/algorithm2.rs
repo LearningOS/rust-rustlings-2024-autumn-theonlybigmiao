@@ -77,10 +77,12 @@ impl<T> LinkedList<T> {
         let mut temp = None; 
 
         while let Some(node) = current {
-            temp = node.as_ref().next; // 保存当前节点的 `next` 节点
-            node.as_ref().next = node.as_ref().prev; // `next` 指向 `prev`
-            node.as_ref().prev = temp; // `prev` 指向原来的 `next`
-            current = node.as_ref().prev; // 移动到原来的 `next` 节点
+            temp = unsafe{(*node.as_ptr()).next}; // 保存当前节点的 `next` 节点
+            unsafe{
+                (*node.as_ptr()).next = (*node.as_ptr()).prev; // `next` 指向 `prev`
+                (*node.as_ptr()).prev = temp; // `prev` 指向原来的 `next`
+            }
+            current = unsafe{(*node.as_ptr()).prev}; // 移动到原来的 `next` 节点
         }
 
         // 交换 `start` 和 `end` 指针

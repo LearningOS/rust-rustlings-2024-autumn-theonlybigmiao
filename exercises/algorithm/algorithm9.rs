@@ -6,10 +6,10 @@
 
 use std::cmp::Ord;
 use std::default::Default;
-
+use std::clone::Clone;
 pub struct Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     count: usize,
     items: Vec<T>,
@@ -18,7 +18,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
@@ -38,6 +38,14 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(T::default());
+        self.count += 1;
+        let mut idx = self.count;
+        while (idx!=1)&&(self.comparator)(&value,&self.items[idx/2]){
+            self.items[idx]=self.items[idx/2].clone();
+            idx/=2;
+        }
+        self.items[idx]=value;
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,14 +65,24 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        // //TODO
+		// 0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+
+        if right <= self.count && !((self.comparator)(&self.items[left], &self.items[right])) {
+            right
+        } else {
+            left
+        }
     }
+
+
 }
 
 impl<T> Heap<T>
 where
-    T: Default + Ord,
+    T: Default + Ord + Clone,
 {
     /// Create a new MinHeap
     pub fn new_min() -> Self {
@@ -79,13 +97,18 @@ where
 
 impl<T> Iterator for Heap<T>
 where
-    T: Default,
+    T: Default + Clone,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		// None
+        if self.count == 0 {
+            return None;
+        }
+        self.count-=1;
+        Some(self.items.remove(1))
     }
 }
 
@@ -95,7 +118,7 @@ impl MinHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + Clone,
     {
         Heap::new(|a, b| a < b)
     }
@@ -107,7 +130,7 @@ impl MaxHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + Clone,
     {
         Heap::new(|a, b| a > b)
     }
@@ -129,6 +152,11 @@ mod tests {
         heap.add(2);
         heap.add(9);
         heap.add(11);
+        for item in &heap.items{
+            print!("{} ", item);
+            println!();
+        }
+        print!("{} ", heap.items.len());
         assert_eq!(heap.len(), 4);
         assert_eq!(heap.next(), Some(2));
         assert_eq!(heap.next(), Some(4));
@@ -144,6 +172,10 @@ mod tests {
         heap.add(2);
         heap.add(9);
         heap.add(11);
+        for item in &heap.items{
+            print!("{} ", item);
+            println!();
+        }
         assert_eq!(heap.len(), 4);
         assert_eq!(heap.next(), Some(11));
         assert_eq!(heap.next(), Some(9));
