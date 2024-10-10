@@ -3,8 +3,6 @@
 // Execute `rustlings hint options1` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 fn maybe_icecream(time_of_day: u16) -> Option<u16> {
     match time_of_day{
         0..=21=>Some(5),
